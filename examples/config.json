@@ -1,0 +1,13 @@
+{
+  "oneviewAddress": "15.114.114.156",
+  "credential": {
+    "userName": "administrator",
+    "password": "hpvse123",
+    "authLoginDomain": "local"
+  },
+  "enclosures": [],
+  "storage-systems": [
+    "172.18.11.13"
+  ],
+  "server-hardware": []
+}

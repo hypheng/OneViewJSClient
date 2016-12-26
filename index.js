@@ -44,23 +44,26 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
       this.request = this.request.defaults({
         headers: {
           auth: loginResponseBody.sessionID,
-          'X-API-Version', applianceAPIVersion.currentVersion,
+          'X-API-Version': applianceAPIVersion.currentVersion,
         },
       });
     }.bind(this));
   };
 
   const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
-  HTTP_METHODS.forEach((method) => {
-    this[method] = function (options) {
-      return this.request[method](options).catch((err) => {
-        return co(function*() {
-          if (err.statusCode === 401) {
-            yield this.login();
-            return yield this.request[method](options);
-          };
+  HTTP_METHODS.forEach(function addHTTPMethod(method) {
+    // return Promise
+    this[method] = function generalHTTPMethod(options) {
+      return this.request[method](options).catch(
+        function errorHandler(err) {
+          return co(function* loginAndRetryGen() {
+            if (err.statusCode === 401) {
+              yield this.login();
+              return yield this.request[method](options);
+            }
+            throw err;
+          }.bind(this));
         }.bind(this));
-      }.bind(this));
     };
   }.bind(this));
 };
