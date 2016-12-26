@@ -1,0 +1,66 @@
+const request = require('request-promise');
+const co = require('co');
+/*
+ * Create OneView client
+ * All API returns promise
+ */
+module.exports = function OneViewClient(address, credential, ignoreCert) {
+  this.address = address;
+  this.credential = credential;
+  this.ignoreCert = ignoreCert;
+  this.request = request.defaults({
+    baseUrl: `https://${address}`,
+    rejectUnauthorized: !ignoreCert,
+    json: true, // auto parse response body
+    forever: true, // connection: keep-alive
+    timeout: 10000, // 10 seconds timeout
+  });
+
+  // This function set the header permanently in client
+  // To set header temporary, just pass the header in the options
+  this.addHeader = function addHeader(key, value) {
+    this.request = this.request.defaults({
+      headers: {
+        [key]: value,
+      },
+    });
+  };
+
+  this.login = function login() {
+    return co(function* loginGen() {
+      const loginResponseBody = yield this.request.post({
+        uri: '/rest/login-sessions',
+        headers: {
+          'X-API-Version': 120, // support from OneView 1.20
+        },
+        json: credential,
+      });
+
+      // Get appliance supported API version
+      const applianceAPIVersion = yield this.request.get({
+        uri: '/rest/version'
+      });
+
+      this.request = this.request.defaults({
+        headers: {
+          auth: loginResponseBody.sessionID,
+          'X-API-Version', applianceAPIVersion.currentVersion,
+        },
+      });
+    }.bind(this));
+  };
+
+  const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
+  HTTP_METHODS.forEach((method) => {
+    this[method] = function (options) {
+      return this.request[method](options).catch((err) => {
+        return co(function*() {
+          if (err.statusCode === 401) {
+            yield this.login();
+            return yield this.request[method](options);
+          };
+        }.bind(this));
+      }.bind(this));
+    };
+  }.bind(this));
+};

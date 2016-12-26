@@ -1,0 +1,29 @@
+{
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+
+  "env": {
+    "node": true,
+    "es6": true
+  },
+
+  "plugins": [
+    "import",
+    "promise",
+    "i18n"
+  ],
+
+  "globals": {
+    "NODE_ENV": true
+  },
+
+  "rules": {
+    "i18n/no-chinese-character": 2
+  },
+
+  "extends": ["airbnb-base"],
+  "installedESLint": true
+}
