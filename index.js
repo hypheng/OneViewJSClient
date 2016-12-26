@@ -33,12 +33,15 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
         headers: {
           'X-API-Version': 120, // support from OneView 1.20
         },
-        json: credential,
+        body: credential,
       });
 
       // Get appliance supported API version
       const applianceAPIVersion = yield this.request.get({
-        uri: '/rest/version'
+        uri: '/rest/version',
+        headers: {
+          'X-API-Version': 120, // support from OneView 1.20
+        },
       });
 
       this.request = this.request.defaults({
@@ -66,4 +69,26 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
         }.bind(this));
     };
   }.bind(this));
+
+  this.waitTaskComplete = function waitTaskComplete(taskUri) {
+    return co(function* waitTaskCompleteGen() {
+      let task;
+      do {
+        task = yield this.get({
+          uri: taskUri
+        });
+        yield this.wait(500);
+      } while (task.percentComplete !== 100);
+
+      return yield this.get({
+        uri: task.associatedResource.resourceUri,
+      });
+    }.bind(this));
+  };
+
+  this.wait = function wait(ms) {
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, ms);
+    });
+  };
 };

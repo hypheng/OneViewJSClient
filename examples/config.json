@@ -6,8 +6,9 @@
     "authLoginDomain": "local"
   },
   "enclosures": [],
+  "storageSystemDomain": "ScaleTestingDomain",
   "storage-systems": [
-    "172.18.11.13"
+    "172.18.11.17"
   ],
   "server-hardware": []
 }
