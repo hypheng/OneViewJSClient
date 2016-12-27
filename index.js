@@ -77,7 +77,7 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
         task = yield this.get({
           uri: taskUri
         });
-        yield this.wait(500);
+        yield this.wait(1000);
       } while (task.percentComplete !== 100);
 
       return yield this.get({
