@@ -70,19 +70,40 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
     };
   }.bind(this));
 
+  this.getAllMembers = function getAllMembers(options) {
+    return co(function* getAllGen() {
+      let start = 0;
+      let all = [];
+      let resourceList;
+      do {
+        resourceList = yield this.get({
+          uri: `${options.uri}?start=${start}`,
+        });
+        all.push(...resourceList.members);
+        start += resourceList.count;
+      } while (start < resourceList.total);
+      return all;
+    }.bind(this));
+  };
+
+  // Return associated resource URI of the task
   this.waitTaskComplete = function waitTaskComplete(taskUri) {
     return co(function* waitTaskCompleteGen() {
       let task;
       do {
         task = yield this.get({
-          uri: taskUri
+          uri: taskUri,
         });
         yield this.wait(1000);
       } while (task.percentComplete !== 100);
 
-      return yield this.get({
-        uri: task.associatedResource.resourceUri,
-      });
+      if (task.taskState === 'Completed') {
+        return yield this.get({
+          uri: task.associatedResource.resourceUri,
+        });
+      } else {
+        throw new Error(JSON.stringify(task));
+      }
     }.bind(this));
   };
 
