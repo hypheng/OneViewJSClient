@@ -52,10 +52,20 @@ co(function*() {
                 shareable: false
               },
             },
+          }).catch(err => {
+            console.log(`post volume error for ${newVolumeName}, ${err.message}`);
+            return null;
           });
-          console.log(`volume is posted, task: ${postRes.headers.location}`);
-          const volume = yield client.waitTaskComplete(postRes.headers.location);
-          console.log(`volume ${volume.name} is created`);
+          if (postRes) {
+            console.log(`volume is posted, task: ${postRes.headers.location}`);
+            const volume = yield client.waitTaskComplete(postRes.headers.location).catch(err => {
+              console.log(`volume ${newVolumeName} is created is not created because ${err.taskErrors[0].message}`);
+              return null;
+            });
+            if (volume) {
+              console.log(`volume ${volume.name} is created`);
+            }
+          }
         }
       }));
     }

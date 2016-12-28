@@ -77,13 +77,22 @@ co(function*() {
           password: 'dcs',
         },
       });
-      console.log(`enclosure is posted, task: ${postEnclRes.headers.location}`);
-      enclosure = yield client.waitTaskComplete(postEnclRes.headers.location);
-      console.log(`enclosure ${enclosureAddress} is added`);
+      console.log(`enclosure ${enclosureAddress} is posted, task: ${postEnclRes.headers.location}`);
+      enclosure = yield client.waitTaskComplete(postEnclRes.headers.location).catch(err => {
+        console.log(`enclosure ${enclosureAddress} is not added because ${err.taskErrors[0].message}`);
+        return null;
+      });
+      if (enclosure) {
+        console.log(`enclosure ${enclosureAddress} is added`);
+      }
     }
   }
 }).then(() => {
   console.log('Done');
 }).catch((err) => {
-  console.error(`${err.name} ${err.message}, stack:${err.stack}`);
+  if (err instanceof Error) {
+    console.error(`${err.message}, stack:${err.stack}`);
+  } else {
+    console.error(JSON.stringify(err));
+  }
 });

@@ -93,16 +93,18 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
       do {
         task = yield this.get({
           uri: taskUri,
+        }).catch(() => {
+          return null;
         });
         yield this.wait(1000);
-      } while (task.percentComplete !== 100);
+      } while (!task || task.percentComplete !== 100);
 
       if (task.taskState === 'Completed') {
         return yield this.get({
           uri: task.associatedResource.resourceUri,
         });
       } else {
-        throw new Error(JSON.stringify(task));
+        throw task;
       }
     }.bind(this));
   };

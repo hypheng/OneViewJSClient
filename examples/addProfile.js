@@ -64,14 +64,24 @@ co(function*() {
             },
             sanStorage: null,
           },
+        }).catch(err => {
+          console.log(`post profile error for ${newProfileName}, ${err.message}`);
+          return null;
         });
-        console.log(`server profile is posted, task: ${postRes.headers.location}`);
-        const profile = yield client.waitTaskComplete(postRes.headers.location);
-        console.log(`server profile ${profile.name} is created`);
+        if (postRes) {
+          console.log(`server profile is posted, task: ${postRes.headers.location}`);
+          const profile = yield client.waitTaskComplete(postRes.headers.location).catch(err => {
+            console.log(`server profile ${newProfileName} is not created because ${err.taskErrors[0].message}`);
+            return null;
+          });
+          if (profile) {
+            console.log(`server profile ${profile.name} is created`);
+          }
+        }
       }
     }));
 
-    // concurrency is 16
+    // concurrency is 64
     if (i % 64 === 0) {
       yield Promise.all(promises);
       promises = [];
@@ -80,5 +90,5 @@ co(function*() {
 }).then(() => {
   console.log('Done');
 }).catch((err) => {
-  console.error(`${err.name} ${err.message}, stack:${err.stack}`);
+  console.error(`${err.message}, stack:${err.stack}`);
 });
