@@ -81,8 +81,8 @@ co(function*() {
       }
     }));
 
-    // concurrency is 64
-    if (i % 64 === 0) {
+    // concurrency is 16
+    if (i % 16 === 0) {
       yield Promise.all(promises);
       promises = [];
     }

@@ -97,9 +97,11 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
           return null;
         });
         yield this.wait(1000);
-      } while (!task || task.percentComplete !== 100);
+      } while (!task ||
+          //task percentComplete can be 0 but taskState = Completed in some API
+          (task.percentComplete !== 100 && task.taskState !== 'Completed'));
 
-      if (task.taskState === 'Completed') {
+      if (task.taskState === 'Completed' || task.taskState === 'Warning') {
         return yield this.get({
           uri: task.associatedResource.resourceUri,
         });
