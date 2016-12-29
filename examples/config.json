@@ -1,5 +1,4 @@
 {
-  "oneviewAddress": "15.114.114.196",
   "credential": {
     "userName": "administrator",
     "password": "hpvse123",
@@ -90,5 +89,5 @@
     "172.18.11.49",
     "172.18.11.50"
   ],
-  "server-hardware": []
+  "createEmptyProfile": true
 }

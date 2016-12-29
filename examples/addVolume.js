@@ -6,7 +6,7 @@ const config = require('./config');
 // Create storage volumes into OneView
 // Tested only again 3.00 OneView
 co(function*() {
-  const client = new OneViewClient(config.oneviewAddress, config.credential, true);
+  const client = new OneViewClient(process.argv[2], config.credential, true);
   yield client.login();
 
   const storageSystems = yield client.getAllMembers({
@@ -59,7 +59,8 @@ co(function*() {
           if (postRes) {
             console.log(`volume is posted, task: ${postRes.headers.location}`);
             const volume = yield client.waitTaskComplete(postRes.headers.location).catch(err => {
-              console.log(`volume ${newVolumeName} is created is not created because ${err.taskErrors[0].message}`);
+              console.log(`volume ${newVolumeName} is not created because` +
+                  ` ${err.taskErrors && err.taskErrors.length > 0 ? err.taskErrors[0].message : JSON.stringify(err)}`);
               return null;
             });
             if (volume) {

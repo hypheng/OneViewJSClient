@@ -6,7 +6,7 @@ const config = require('./config');
 // Create server profiles in OneView
 // Tested only again 3.00 OneView
 co(function*() {
-  const client = new OneViewClient(config.oneviewAddress, config.credential, true);
+  const client = new OneViewClient(process.argv[2], config.credential, true);
   yield client.login();
 
   const servers = yield client.getAllMembers({
@@ -30,7 +30,7 @@ co(function*() {
           body: {
             name: newProfileName,
             type: 'ServerProfileV6',
-            serverHardwareUri: server.uri,
+            serverHardwareUri: config.createEmptyProfile ? null : server.uri,
             serverHardwareTypeUri: server.serverHardwareTypeUri,
             enclosureGroupUri: server.serverGroupUri,
             serialNumberType: 'Virtual',
@@ -81,8 +81,8 @@ co(function*() {
       }
     }));
 
-    // concurrency is 16
-    if (i % 16 === 0) {
+    // concurrency
+    if ((i + 1) % 16 === 0) {
       yield Promise.all(promises);
       promises = [];
     }

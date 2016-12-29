@@ -6,7 +6,7 @@ const config = require('./config');
 // Add storage systems and storage pools into OneView
 // Tested only again 3.00 OneView
 co(function*() {
-  const client = new OneViewClient(config.oneviewAddress, config.credential, true);
+  const client = new OneViewClient(process.argv[2], config.credential, true);
   yield client.login();
 
   const storageSystemAddresses = config['storage-systems'];
