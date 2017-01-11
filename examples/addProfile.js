@@ -71,7 +71,7 @@ co(function*() {
         if (postRes) {
           console.log(`server profile is posted, task: ${postRes.headers.location}`);
           const profile = yield client.waitTaskComplete(postRes.headers.location).catch(err => {
-            console.log(`server profile ${newProfileName} is not created because ${err.taskErrors[0].message}`);
+            console.log(`server profile ${newProfileName} is not created because ${err.taskErrors ? err : err.taskErrors[0].message}`);
             return null;
           });
           if (profile) {
