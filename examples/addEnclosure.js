@@ -30,10 +30,43 @@ module.exports = function addEnclosure(ip) {
         uri: '/rest/enclosure-groups',
         resolveWithFullResponse: true,
         body: {
-          type: 'EnclosureGroupV300',
+          type: 'EnclosureGroupV200',
           name: DefaultEnclosureGroupName,
-          interconnectBayMappings: [],
-          interconnectBayMappingCount: 0,
+          interconnectBayMappings: [
+            {
+              "interconnectBay": 1,
+              "logicalInterconnectGroupUri": null
+            },
+            {
+              "interconnectBay": 2,
+              "logicalInterconnectGroupUri": null
+            },
+            {
+              "interconnectBay": 3,
+              "logicalInterconnectGroupUri": null
+            },
+            {
+              "interconnectBay": 4,
+              "logicalInterconnectGroupUri": null
+            },
+            {
+              "interconnectBay": 5,
+              "logicalInterconnectGroupUri": null
+            },
+            {
+              "interconnectBay": 6,
+              "logicalInterconnectGroupUri": null
+            },
+            {
+              "interconnectBay": 7,
+              "logicalInterconnectGroupUri": null
+            },
+            {
+              "interconnectBay": 8,
+              "logicalInterconnectGroupUri": null
+            },
+          ],
+          interconnectBayMappingCount: 8,
           stackingMode: 'Enclosure',
           configurationScript: '',
           uri: null,
