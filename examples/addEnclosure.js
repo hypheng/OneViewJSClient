@@ -44,9 +44,9 @@ module.exports = function addEnclosure(ip) {
           enclosureTypeUri: '/rest/enclosure-types/c7000',
         },
       });
-      console.log(`default enclosure group is posted, task: ${postEGRes.headers.location}`);
+      console.log(`[${ip}] default enclosure group is posted, task: ${postEGRes.headers.location}`);
       eg = yield client.waitTaskComplete(postEGRes.headers.location);
-      console.log(`default enclosure group is created`);
+      console.log(`[${ip}] default enclosure group is created`);
     } else {
       eg = egArray[0];
     }
@@ -80,13 +80,13 @@ module.exports = function addEnclosure(ip) {
               password: 'dcs',
             },
           });
-          console.log(`enclosure ${enclosureAddress} is posted, task: ${postEnclRes.headers.location}`);
+          console.log(`[${ip}] enclosure ${enclosureAddress} is posted, task: ${postEnclRes.headers.location}`);
           enclosure = yield client.waitTaskComplete(postEnclRes.headers.location).catch(err => {
-            console.log(`enclosure ${enclosureAddress} is not added because ${err.taskErrors[0].message}`);
+            console.log(`[${ip}] enclosure ${enclosureAddress} is not added because ${err.taskErrors[0].message}`);
             return null;
           });
           if (enclosure) {
-            console.log(`enclosure ${enclosureAddress} is added`);
+            console.log(`[${ip}] enclosure ${enclosureAddress} is added`);
           }
         }
       }));
@@ -105,7 +105,7 @@ if (require.main === module) {
     console.log('Done');
   }).catch((err) => {
     if (err instanceof Error) {
-      console.error(`${err.message}, stack:${err.stack}`);
+      console.error(`[${ip}] ${err.message}, stack:${err.stack}`);
     } else {
       console.error(JSON.stringify(err));
     }

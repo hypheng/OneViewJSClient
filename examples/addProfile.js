@@ -16,7 +16,7 @@ module.exports = function addProfile(ip) {
     const profiles = yield client.getAllMembers({
       uri: '/rest/server-profiles/',
     });
-    console.log(`There exist ${profiles.length} profiles ${servers.length} servers`);
+    console.log(`[${ip}] There exist ${profiles.length} profiles ${servers.length} servers`);
 
     const profileNames = new Set(profiles.map(profile => profile.name));
     let promises = [];
@@ -66,17 +66,17 @@ module.exports = function addProfile(ip) {
               sanStorage: null,
             },
           }).catch(err => {
-            console.log(`post profile error for ${newProfileName}, ${err.message}`);
+            console.log(`[${ip}] post profile error for ${newProfileName}, ${err.message}`);
             return null;
           });
           if (postRes) {
-            console.log(`server profile is posted, task: ${postRes.headers.location}`);
+            console.log(`[${ip}] server profile is posted, task: ${postRes.headers.location}`);
             const profile = yield client.waitTaskComplete(postRes.headers.location).catch(err => {
-              console.log(`server profile ${newProfileName} is not created because ${err.taskErrors ? err : err.taskErrors[0].message}`);
+              console.log(`[${ip}] server profile ${newProfileName} is not created because ${err.taskErrors ? err : err.taskErrors[0].message}`);
               return null;
             });
             if (profile) {
-              console.log(`server profile ${profile.name} is created`);
+              console.log(`[${ip}] server profile ${profile.name} is created`);
             }
           }
         }
@@ -95,6 +95,6 @@ if (require.main === module) {
   module.exports(process.argv[2]).then(() => {
     console.log('Done');
   }).catch((err) => {
-    console.error(`${err.message}, stack:${err.stack}`);
+    console.error(`[${ip}] ${err.message}, stack:${err.stack}`);
   });
 }

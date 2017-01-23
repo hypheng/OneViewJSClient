@@ -27,7 +27,7 @@ module.exports = function addVolume(ip) {
       uri: '/rest/storage-volumes',
     });
 
-    console.log(`There exist ${storagePools.length} storage-pools ${volumes.length} volumes`);
+    console.log(`[${ip}] There exist ${storagePools.length} storage-pools ${volumes.length} volumes`);
 
     const volumeNames = new Set(volumes.map(volume => volume.name));
     for (let i = 0; i < storagePools.length; i += 1) {
@@ -54,18 +54,18 @@ module.exports = function addVolume(ip) {
                 },
               },
             }).catch(err => {
-              console.log(`post volume error for ${newVolumeName}, ${err.message}`);
+              console.log(`[${ip}] post volume error for ${newVolumeName}, ${err.message}`);
               return null;
             });
             if (postRes) {
-              console.log(`volume is posted, task: ${postRes.headers.location}`);
+              console.log(`[${ip}] volume is posted, task: ${postRes.headers.location}`);
               const volume = yield client.waitTaskComplete(postRes.headers.location).catch(err => {
-                console.log(`volume ${newVolumeName} is not created because` +
+                console.log(`[${ip}] volume ${newVolumeName} is not created because` +
                     ` ${err.taskErrors && err.taskErrors.length > 0 ? err.taskErrors[0].message : JSON.stringify(err)}`);
                 return null;
               });
               if (volume) {
-                console.log(`volume ${volume.name} is created`);
+                console.log(`[${ip}] volume ${volume.name} is created`);
               }
             }
           }
@@ -80,6 +80,6 @@ if (require.main === module) {
   module.exports(process.argv[2]).then(() => {
     console.log('Done');
   }).catch((err) => {
-    console.error(`${err.name} ${err.message}, stack:${err.stack}`);
+    console.error(`[${ip}] ${err.name} ${err.message}, stack:${err.stack}`);
   });
 }

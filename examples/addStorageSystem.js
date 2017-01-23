@@ -24,9 +24,9 @@ module.exports = function addStorageSystem(ip) {
           'password': 'dcs',
         },
       });
-      console.log(`storage-system is posted, task: ${postRes.headers.location}`);
+      console.log(`[${ip}] is posted, task: ${postRes.headers.location}`);
       storageSystem = yield client.waitTaskComplete(postRes.headers.location);
-      console.log(`storage-system ${storageSystemAddress} is ${storageSystem.state}`);
+      console.log(`[${ip}] ${storageSystemAddress} is ${storageSystem.state}`);
 
       // Add storage-pools into storage-system
       const storagePools = storageSystem.unmanagedPools
@@ -72,9 +72,9 @@ module.exports = function addStorageSystem(ip) {
           uri: storageSystem.uri,
         },
       });
-      console.log(`${storagePools.length} storage-pools are put into storage-system, task: ${putRes.headers.location}`);
+      console.log(`[${ip}] storage-pools are put into storage-system, task: ${putRes.headers.location}`);
       storageSystem = yield client.waitTaskComplete(putRes.headers.location);
-      console.log(`${storageSystem.managedPools.length} storage-pools are in storageSystemUri`);
+      console.log(`[${ip}] ${storageSystem.managedPools.length} storage-pools are in storageSystemUri`);
     }
   });
 };
@@ -83,6 +83,6 @@ if (require.main === module) {
   module.exports(process.argv[2]).then(() => {
     console.log('Done');
   }).catch((err) => {
-    console.error(`${err.name} ${err.message}, stack:${err.stack}`);
+    console.error(`[${ip}] ${err.name} ${err.message}, stack:${err.stack}`);
   });
 }
