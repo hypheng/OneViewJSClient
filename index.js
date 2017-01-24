@@ -13,7 +13,7 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
     rejectUnauthorized: !ignoreCert,
     json: true, // auto parse response body
     forever: true, // connection: keep-alive
-    timeout: 10000, // 10 seconds timeout
+    timeout: 30000, // 30 seconds timeout
   });
 
   // This function set the header permanently in client
