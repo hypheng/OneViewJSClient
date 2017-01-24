@@ -10,26 +10,39 @@ module.exports = function addStorageSystem(ip) {
     const client = new OneViewClient(ip, config.credential, true);
     yield client.login();
 
+    const existingStorageSystemList = yield client.get({
+      uri: '/rest/storage-systems',
+    });
+
     const storageSystemAddresses = config['storage-systems'];
     let storageSystem;
     let task;
     for(let i = 0; i < storageSystemAddresses.length; i += 1) {
       const storageSystemAddress = storageSystemAddresses[i];
-      const postRes = yield client.post({
-        uri: '/rest/storage-systems',
-        resolveWithFullResponse: true,
-        body: {
-          'ip_hostname': storageSystemAddress,
-          'username': 'dcs',
-          'password': 'dcs',
-        },
+      const storageSystemArray = existingStorageSystemList.members.filter((storageSystem) => {
+        return storageSystem.credentials.ip_hostname === storageSystemAddress;
       });
-      console.log(`[${ip}] is posted, task: ${postRes.headers.location}`);
-      storageSystem = yield client.waitTaskComplete(postRes.headers.location);
-      console.log(`[${ip}] ${storageSystemAddress} is ${storageSystem.state}`);
+      if (storageSystemArray.length === 0 ) {
+        const postRes = yield client.post({
+          uri: '/rest/storage-systems',
+          resolveWithFullResponse: true,
+          body: {
+            'ip_hostname': storageSystemAddress,
+            'username': 'dcs',
+            'password': 'dcs',
+          },
+        });
+        console.log(`[${ip}] is posted, task: ${postRes.headers.location}`);
+        storageSystem = yield client.waitTaskComplete(postRes.headers.location);
+        console.log(`[${ip}] ${storageSystemAddress} is ${storageSystem.state}`);
+      } else if (storageSystemArray.length === 1) {
+        storageSystem = storageSystemArray[0];
+      } else {
+        console.error(`[${ip}] two same storage system with same address ${JSON.stringify(storageSystemArray)}`);
+      }
 
       // Add storage-pools into storage-system
-      const storagePools = storageSystem.unmanagedPools
+      const storagePools = [].concat(storageSystem.unmanagedPools, storageSystem.managedPools)
         .filter(storagePool => storagePool.domain === config.storageSystemDomain)
         .map((storagePool) => {
           return {
