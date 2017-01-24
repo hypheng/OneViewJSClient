@@ -10,38 +10,38 @@ module.exports = function fts(oldIP, newIP) {
     let initialCredential = Object.assign({}, config.credential);
     initialCredential.password = 'admin';
     let client = new OneViewClient(oldIP, initialCredential, true);
-    console.log('accept eula');
+    console.log(`[${newIP}] accept eula`);
     const eulaResBody = yield client.post({
       uri: '/rest/appliance/eula/save',
       body: { supportAccess: 'yes' },
     });
-    console.log('eula accepted');
+    console.log(`[${newIP}] eula accepted`);
 
-    console.log('login with initial password');
+    console.log(`[${newIP}] login with initial password`);
     let loginSuccess = yield client.login().catch((err) => {
       if (err.statusCode === 403) {
         return Promise.resolve(true);
       } else {
-        console.log('login with initial password failed');
+        console.log(`[${newIP}] login with initial password failed`);
         return Promise.resolve(false);
       }
     });
 
     if (loginSuccess) {
-      console.log('change password');
+      console.log(`[${newIP}] change password`);
       const changePasswordBody = yield client.post({
         uri: '/rest/users/changePassword',
         body: {"userName":"administrator","oldPassword":"admin","newPassword":"hpvse123"},
       });
-      console.log('password changed');
+      console.log(`[${newIP}] password changed`);
     }
 
     client = new OneViewClient(oldIP, config.credential, true);
-    console.log('login with new password');
+    console.log(`[${newIP}] login with new password`);
     yield client.login();
-    console.log('login with new password succeed');
+    console.log(`[${newIP}] login with new password succeed`);
 
-    console.log('check if network is initialized');
+    console.log(`[${newIP}] check if network is initialized`);
     const networkConfiguredBody = yield client.get({
       uri: '/rest/global-settings/appliance/global/setup-network-configured',
     }).catch((err) => {
@@ -49,12 +49,12 @@ module.exports = function fts(oldIP, newIP) {
     });
 
     if (networkConfiguredBody.value !== "true") {
-      console.log('get default network setting');
+      console.log(`[${newIP}] get default network setting`);
       const initNetwork = yield client.get({
         uri: '/rest/appliance/network-interfaces',
       });
 
-      console.log('init network');
+      console.log(`[${newIP}] init network`);
       const hostname = newIP.replace(/\./g, '-');
       const initNetworkRes = yield client.post({
         uri: '/rest/appliance/network-interfaces',
@@ -110,32 +110,32 @@ module.exports = function fts(oldIP, newIP) {
           }
         }
       });
-      console.log('network configuration is sent');
+      console.log(`[${newIP}] network configuration is sent`);
 
       client = new OneViewClient(newIP, config.credential, true);
       loginSuccess = false;
       while (!loginSuccess) {
         yield client.wait(3000);
-        console.log('check new IP');
+        console.log(`[${newIP}] check new IP`);
         loginSuccess = yield client.login()
           .then(() => {
-            console.log('login with new password succeed');
+            console.log(`[${newIP}] login with new password succeed`);
             return Promise.resolve(true);
           }, (err) => {
-            console.log('login with new password failed');
+            console.log(`[${newIP}] login with new password failed`);
             return Promise.resolve(false);
           });
       }
-      console.log('new IP is accessible');
+      console.log(`[${newIP}] new IP is accessible`);
     } else {
-      console.log('network is already initialized');
+      console.log(`[${newIP}] network is already initialized`);
     }
   });
 };
 
 if (require.main === module) {
   module.exports(process.argv[2], process.argv[3]).then(() => {
-    console.log('Done');
+    console.log(`[${process.argv[3]}] Done`);
   }).catch((err) => {
     if (err instanceof Error) {
       console.error(`${err.message}, stack:${err.stack}`);
