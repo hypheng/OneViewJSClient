@@ -41,10 +41,6 @@ module.exports = function addProfile(ip) {
               description: '',
               affinity: 'Bay',
               connections: [],
-              boot: {
-                manageBoot: true,
-                order: [ 'CD', 'Floppy', 'USB', 'HardDisk', 'PXE' ],
-              },
               bootMode: null,
               firmware: {
                 manageFirmware: false,
@@ -72,7 +68,7 @@ module.exports = function addProfile(ip) {
           if (postRes) {
             console.log(`[${ip}] server profile is posted, task: ${postRes.headers.location}`);
             const profile = yield client.waitTaskComplete(postRes.headers.location).catch(err => {
-              console.log(`[${ip}] server profile ${newProfileName} is not created because ${err.taskErrors ? err : err.taskErrors[0].message}`);
+              console.log(`[${ip}] server profile ${newProfileName} is not created because ${err.taskErrors ? JSON.stringify(err) : err.taskErrors[0].message}`);
               return null;
             });
             if (profile) {
