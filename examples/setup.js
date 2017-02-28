@@ -61,7 +61,7 @@ co(function*() {
   const { oneviews, staticIPs } = config;
   const promises = oneviews.map((oneviewIP, index) => {
     return co(function *() {
-      //yield addSshPass(oneviewIP);
+      yield addSshPass(oneviewIP);
       yield waitForDCS(oneviewIP);
       yield fts(oneviewIP, staticIPs[index]);
       yield addEnclosure(staticIPs[index]);
