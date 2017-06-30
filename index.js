@@ -98,6 +98,8 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
         });
         yield this.wait(1000);
       } while (!task ||
+          // storage task will be in following state when percentComplete is 100
+          !task.taskState || task.taskState === 'New' || task.taskState === 'Running' ||
           //task percentComplete can be 0 but taskState = Completed in some API
           (task.percentComplete !== 100 && task.taskState !== 'Completed'));
 
