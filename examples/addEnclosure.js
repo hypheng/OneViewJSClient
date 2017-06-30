@@ -30,7 +30,7 @@ module.exports = function addEnclosure(ip) {
         uri: '/rest/enclosure-groups',
         resolveWithFullResponse: true,
         body: {
-          type: 'EnclosureGroupV300',
+          type: 'EnclosureGroupV400',
           name: DefaultEnclosureGroupName,
           interconnectBayMappings: [],
           interconnectBayMappingCount: 0,
@@ -105,7 +105,7 @@ if (require.main === module) {
     console.log('Done');
   }).catch((err) => {
     if (err instanceof Error) {
-      console.error(`[${ip}] ${err.message}, stack:${err.stack}`);
+      console.error(`[${process.argv[2]}] ${err.message}, stack:${err.stack}`);
     } else {
       console.error(JSON.stringify(err));
     }
