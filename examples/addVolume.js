@@ -30,10 +30,10 @@ module.exports = function addVolume(ip) {
     console.log(`[${ip}] There exist ${storagePools.length} storage-pools ${volumes.length} volumes`);
 
     const volumeNames = new Set(volumes.map(volume => volume.name));
-    for (let i = 0; i < storagePools.length; i += 1) {
+    for (let i = 0; i < 1000; i += 1) {
       const storagePool = storagePools[i];
       const promises = [];
-      for (let j = 0; j < 8; j +=1) {
+      for (let j = 0; j < 10; j +=1) {
         promises.push(co(function* creatVolumeGen() {
           const newVolumeName = 
             `${ssUriNameMap[storagePool.storageSystemUri]}-${storagePool.name}-v${j}`;
