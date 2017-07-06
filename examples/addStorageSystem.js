@@ -10,7 +10,7 @@ module.exports = function addStorageSystem(ip) {
     const client = new OneViewClient(ip, config.credential, true);
     yield client.login();
 
-    const existingStorageSystemList = yield client.getAllMembers({
+    const existingStorageSystemArray = yield client.getAllMembers({
       uri: '/rest/storage-systems',
     });
 
@@ -19,7 +19,7 @@ module.exports = function addStorageSystem(ip) {
     let task;
     for(let i = 0; i < storageSystemAddresses.length; i += 1) {
       const storageSystemAddress = storageSystemAddresses[i];
-      const storageSystemArray = existingStorageSystemList.members.filter((storageSystem) => {
+      const storageSystemArray = existingStorageSystemArray.filter((storageSystem) => {
         return storageSystem.hostname === storageSystemAddress;
       });
       if (storageSystemArray.length === 0 ) {
