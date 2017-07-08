@@ -23,7 +23,7 @@ module.exports = function addProfile(ip) {
     for(let i = 0; i < servers.length; i += 1) {
       const server = servers[i];
       const newProfileName = `${server.name}-profile`;
-      promises.push(co(function* creatVolumeGen() {
+      promises.push(co(function* creatProfileGen() {
         if (!profileNames.has(newProfileName)) {
           const postRes = yield client.post({
             uri: '/rest/server-profiles',

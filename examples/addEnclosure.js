@@ -58,7 +58,7 @@ module.exports = function addEnclosure(ip) {
     // Add enclosures into OneView
     let promises = [];
     for(let i = 0; i < enclosureAddresses.length; i += 1) {
-      promises.push(co(function* creatVolumeGen() {
+      promises.push(co(function* creatEnclosureGen() {
         const enclosureAddress = enclosureAddresses[i];
         const enclosureArray = existingEnclList.members.filter((enclosure) => {
           return enclosure.activeOaPreferredIP === enclosureAddress;
