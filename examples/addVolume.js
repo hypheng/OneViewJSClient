@@ -80,6 +80,6 @@ if (require.main === module) {
   module.exports(process.argv[2]).then(() => {
     console.log('Done');
   }).catch((err) => {
-    console.error(`[${ip}] ${err.name} ${err.message}, stack:${err.stack}`);
+    console.error(`[${process.argv[2]}] ${err.name} ${err.message}, stack:${err.stack}`);
   });
 }
