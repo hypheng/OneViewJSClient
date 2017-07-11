@@ -55,9 +55,9 @@ module.exports = function fts(oldIP, newIP) {
       });
 
       console.log(`[${newIP}] init network`);
-      const hostname = newIP.replace(/\./g, '-');
       const initNetworkRes = yield client.post({
         uri: '/rest/appliance/network-interfaces',
+        resolveWithFullResponse: true,
         body: {
           "type":"ApplianceNetworkConfiguration",
           "applianceNetworks":[  
@@ -74,7 +74,7 @@ module.exports = function fts(oldIP, newIP) {
             "app1Ipv6Alias":null,
             "app2Ipv4Alias":null,
             "app2Ipv6Alias":null,
-            "hostname":`${hostname}.cn.hpecorp.net`,
+            "hostname":initNetwork.applianceNetworks[0].hostname,
             "confOneNode":true,
             "interfaceName":"",
             "macAddress":initNetwork.applianceNetworks[0].macAddress,
@@ -110,7 +110,7 @@ module.exports = function fts(oldIP, newIP) {
           }
         }
       });
-      console.log(`[${newIP}] network configuration is sent`);
+      console.log(`[${newIP}] network configuration is sent, task: ${initNetworkRes.headers.location}`);
 
       client = new OneViewClient(newIP, config.credential, true);
       loginSuccess = false;
