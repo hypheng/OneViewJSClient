@@ -20,6 +20,7 @@ module.exports = function addProfile(ip) {
       const profile = profiles[i];
       if (profile.status === 'Critical') {
         promises.push(co(function* reapplyProfileGen() {
+          profile.description = 'reapplied';
           const putRes = yield client.put({
             uri: profile.uri,
             resolveWithFullResponse: true,
@@ -29,13 +30,13 @@ module.exports = function addProfile(ip) {
             return null;
           });
           if (putRes) {
-            console.log(`[${ip}] server profile is put, task: ${putRes.headers.location}`);
-            const profile = yield client.waitTaskComplete(putRes.headers.location).catch(err => {
-              console.log(`[${ip}] server profile ${profile.name} is not reapplied because ${err.taskErrors ? JSON.stringify(err) : err.taskErrors[0].message}`);
+            console.log(`[${ip}] server profile ${profile.uri} is put, task: ${putRes.headers.location}`);
+            const newProfile = yield client.waitTaskComplete(putRes.headers.location).catch(err => {
+              console.log(`[${ip}] server profile ${profile.name} is not reapplied because ${err.taskErrors ? JSON.stringify(err) : JSON.stringify(err.taskErrors)}`);
               return null;
             });
-            if (profile) {
-              console.log(`[${ip}] server profile ${profile.name} is reapplied`);
+            if (newProfile) {
+              console.log(`[${ip}] server profile ${newProfile.name} is reapplied`);
             }
           }
         }));
