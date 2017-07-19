@@ -7,7 +7,7 @@ const config = require('./config');
 // Tested only again 3.00 OneView
 module.exports = function addProfile(ip) {
   return co(function*() {
-    const client = new OneViewClient(ip, config.credential, true);
+    const client = new OneViewClient(ip, config.credential, true, 300);
     yield client.login();
 
     const servers = yield client.getAllMembers({

@@ -16,13 +16,11 @@ module.exports = function addEnclosure(ip) {
     let enclosure;
     let task;
 
-    const egList = yield client.get({
+    const egList = yield client.getAllMembers({
       uri: '/rest/enclosure-groups',
     });
 
-    let egArray = egList.members.filter((eg) => {
-      return eg.name === DefaultEnclosureGroupName;
-    });
+    let egArray = egList.filter(eg => eg.name === DefaultEnclosureGroupName);
 
     if (egArray.length === 0) {
       // Create default enclosure group
@@ -46,6 +44,13 @@ module.exports = function addEnclosure(ip) {
       });
       console.log(`[${ip}] default enclosure group is posted, task: ${postEGRes.headers.location}`);
       eg = yield client.waitTaskComplete(postEGRes.headers.location);
+      if (!eg) {
+        // eg task doesn't return associated resource uri, there is no way to get the new resource from POST task
+        const egs = yield client.getAllMembers({
+          uri: '/rest/enclosure-groups',
+        });
+        eg = egs.filter(eg => eg.name === DefaultEnclosureGroupName)[0];
+      }
       console.log(`[${ip}] default enclosure group is created`);
     } else {
       eg = egArray[0];

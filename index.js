@@ -4,10 +4,11 @@ const co = require('co');
  * Create OneView client
  * All API returns promise
  */
-module.exports = function OneViewClient(address, credential, ignoreCert) {
+module.exports = function OneViewClient(address, credential, ignoreCert, apiVersion) {
   this.address = address;
   this.credential = credential;
   this.ignoreCert = ignoreCert;
+  this.apiVersion = apiVersion;
   this.request = request.defaults({
     baseUrl: `https://${address}`,
     rejectUnauthorized: !ignoreCert,
@@ -47,7 +48,7 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
       this.request = this.request.defaults({
         headers: {
           auth: loginResponseBody.sessionID,
-          'X-API-Version': applianceAPIVersion.currentVersion,
+          'X-API-Version': this.apiVersion || applianceAPIVersion.currentVersion,
         },
       });
     }.bind(this));
@@ -104,9 +105,13 @@ module.exports = function OneViewClient(address, credential, ignoreCert) {
           (task.percentComplete !== 100 && task.taskState !== 'Completed'));
 
       if (task.taskState === 'Completed' || task.taskState === 'Warning') {
-        return yield this.get({
-          uri: task.associatedResource.resourceUri,
-        });
+        if (task.associatedResource.resourceUri) {
+          return yield this.get({
+            uri: task.associatedResource.resourceUri,
+          });
+        } else {
+          return null;
+        }
       } else {
         throw task;
       }

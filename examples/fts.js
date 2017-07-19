@@ -36,24 +36,19 @@ module.exports = function fts(oldIP, newIP) {
       console.log(`[${newIP}] password changed`);
     }
 
-    client = new OneViewClient(oldIP, config.credential, true);
+    client = new OneViewClient(oldIP, config.credential, true, 300);
     console.log(`[${newIP}] login with new password`);
     yield client.login();
     console.log(`[${newIP}] login with new password succeed`);
 
-    console.log(`[${newIP}] check if network is initialized`);
-    const networkConfiguredBody = yield client.get({
-      uri: '/rest/global-settings/appliance/global/setup-network-configured',
+    console.log(`[${newIP}] get default network setting`);
+    const initNetwork = yield client.get({
+      uri: '/rest/appliance/network-interfaces',
     }).catch((err) => {
       return Promise.resolve({value: "false"});
     });
 
-    if (networkConfiguredBody.value !== "true") {
-      console.log(`[${newIP}] get default network setting`);
-      const initNetwork = yield client.get({
-        uri: '/rest/appliance/network-interfaces',
-      });
-
+    if (initNetwork.applianceNetworks[0].ipv4Type.toUpperCase() !== "STATIC") {
       console.log(`[${newIP}] init network`);
       const initNetworkRes = yield client.post({
         uri: '/rest/appliance/network-interfaces',

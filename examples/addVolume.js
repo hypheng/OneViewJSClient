@@ -5,9 +5,9 @@ const config = require('./config');
 
 // Create storage volumes into OneView
 // Tested only again 3.00 OneView
-module.exports = function addVolume(ip) {
+module.exports = function addVolume(ip, count) {
   return co(function*() {
-    const client = new OneViewClient(ip, config.credential, true);
+    const client = new OneViewClient(ip, config.credential, true, 300);
     yield client.login();
 
     const storageSystems = yield client.getAllMembers({
@@ -30,8 +30,8 @@ module.exports = function addVolume(ip) {
     console.log(`[${ip}] There exist ${storagePools.length} storage-pools ${volumes.length} volumes`);
 
     const volumeNames = new Set(volumes.map(volume => volume.name));
-    for (let i = 0; i < 1000; i += 1) {
-      const storagePool = storagePools[i];
+    for (let i = 0; i < Math.ceil(count / 10); i += 1) {
+      const storagePool = storagePools[i % storagePools.length];
       const promises = [];
       for (let j = 0; j < 10; j +=1) {
         promises.push(co(function* creatVolumeGen() {

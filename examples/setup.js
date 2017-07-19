@@ -3,9 +3,11 @@ const co = require('co');
 const config = require('./config');
 const fts = require('./fts');
 const addEnclosure = require('./addEnclosure');
+const addSPT = require('./addSPT');
 const addProfile = require('./addProfile');
 const addStorageSystem = require('./addStorageSystem');
 const addVolume = require('./addVolume');
+const addSan = require('./addSan');
 
 const addSshPass = function(ip) {
   return new Promise((resolve, reject) => {
@@ -61,13 +63,15 @@ co(function*() {
   const { oneviews, staticIPs } = config;
   const promises = oneviews.map((oneviewIP, index) => {
     return co(function *() {
-      yield addSshPass(oneviewIP);
-      yield waitForDCS(oneviewIP);
+      //yield addSshPass(oneviewIP);
+      //yield waitForDCS(oneviewIP);
       yield fts(oneviewIP, staticIPs[index]);
       yield addEnclosure(staticIPs[index]);
+      yield addSPT(staticIPs[index]);
       yield addProfile(staticIPs[index]);
       yield addStorageSystem(staticIPs[index]);
-      yield addVolume(staticIPs[index]);
+      yield addVolume(staticIPs[index], 10);
+      yield addSan(staticIPs[index]);
     });
   });
   yield Promise.all(promises);
